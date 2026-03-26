@@ -368,13 +368,13 @@ select:disabled {
     line-height: 1;
     border-radius: 6px;
     padding: 2px 4px;
-    color: #fff;
+    color: var(--text-main);
 }
-.day[data-status="learning"] .day-status-label { background: var(--color-learning); }
-.day[data-status="office"] .day-status-label { background: var(--color-office); }
-.day[data-status="remote"] .day-status-label { background: var(--color-remote); }
-.day[data-status="paidleave"] .day-status-label { background: var(--color-paidleave); }
-.day[data-status="holiday"] .day-status-label { background: var(--color-holiday); }
+.day[data-status="learning"] .day-status-label { background: rgba(244, 196, 48, 0.3); }
+.day[data-status="office"] .day-status-label { background: rgba(58, 167, 109, 0.3); }
+.day[data-status="remote"] .day-status-label { background: rgba(154, 160, 166, 0.3); }
+.day[data-status="paidleave"] .day-status-label { background: rgba(142, 90, 215, 0.3); }
+.day[data-status="holiday"] .day-status-label { background: rgba(47, 128, 237, 0.3); }
 
 /* Right Panel: List */
 .list-panel {
