@@ -17,9 +17,11 @@
                         <option value="office">本社</option>
                         <option value="remote">在宅</option>
                         <option value="learning">ラーニングセンター</option>
+                        <option value="paidleave">有給</option>
                         <option value="holiday">休日</option>
                     </select>
                 </div>
+                <button id="open-workstyle-edit-btn" class="workstyle-edit-btn">勤務形態変更</button>
             </div>
 
             <div class="panel widget urgent-tasks-panel">
@@ -67,6 +69,7 @@
                 <div class="list-tabs">
                     <button class="tab active" data-target="tasks-content">タスク管理</button>
                     <button class="tab" data-target="links-content">リンクメモ</button>
+                    <button class="tab" data-target="memos-content">メモ帳</button>
                 </div>
 
                 <div id="tasks-content" class="tab-content active">
@@ -92,6 +95,14 @@
 
                 <div id="links-content" class="tab-content">
                     <ul id="link-list" class="link-list"></ul>
+                </div>
+                <div id="memos-content" class="tab-content">
+                    <div class="memo-input-row">
+                        <input type="text" id="memo-input" maxlength="50" placeholder="1〜50文字でメモを入力">
+                        <button id="add-memo-btn" class="btn primary">追加</button>
+                    </div>
+                    <p id="memo-error" class="memo-error"></p>
+                    <ul id="memo-list" class="memo-list"></ul>
                 </div>
             </div>
         </main>
@@ -138,6 +149,28 @@
             <div class="modal-actions">
                 <button id="cancel-paste" class="btn secondary">キャンセル</button>
                 <button id="save-paste" class="btn primary">取り込み</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="workstyle-edit-modal" class="modal">
+        <div class="modal-content panel">
+            <h3>勤務形態変更</h3>
+            <div class="form-group">
+                <input type="date" id="workstyle-edit-date">
+            </div>
+            <div class="form-group">
+                <select id="workstyle-edit-select">
+                    <option value="learning">ラーニングセンター</option>
+                    <option value="office">本社</option>
+                    <option value="remote">在宅</option>
+                    <option value="paidleave">有給</option>
+                    <option value="holiday">休日</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-workstyle-edit" class="btn secondary">キャンセル</button>
+                <button id="save-workstyle-edit" class="btn primary">保存</button>
             </div>
         </div>
     </div>

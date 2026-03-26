@@ -15,6 +15,7 @@
     --color-learning: #f4c430; /* 繝ｩ繝ｼ繝九Φ繧ｰ繧ｻ繝ｳ繧ｿ繝ｼ: 襍､ */
     --color-office: #3aa76d;   /* 譛ｬ遉ｾ: 鮟・*/
     --color-remote: #9aa0a6;   /* 蝨ｨ螳・ 邱・*/
+    --color-paidleave: #8e5ad7; /* 有給 */
     --color-holiday: #2f80ed;  /* 莨第律: 髱・*/
     
     --font-heading: 'Noto Sans JP', 'Inter', sans-serif;
@@ -145,6 +146,27 @@ select option {
 select:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+}
+.workstyle-edit-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #F2F8FC;
+    border: 2px solid var(--panel-border);
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    outline: none;
+    padding: 8px 16px;
+    border-radius: 100px;
+    transition: all 0.2s;
+    align-self: flex-start;
+    margin-top: 10px;
+}
+.workstyle-edit-btn:hover {
+    border-color: var(--primary);
+    background: #E8F4FA;
 }
 
 /* Action Buttons */
@@ -325,6 +347,7 @@ select:disabled {
 .day[data-status="office"] .day-indicator { background-color: var(--color-office); }
 .day[data-status="remote"] .day-indicator { background-color: var(--color-remote); }
 .day[data-status="learning"] .day-indicator { background-color: var(--color-learning); }
+.day[data-status="paidleave"] .day-indicator { background-color: var(--color-paidleave); }
 .day[data-status="holiday"] .day-indicator { background-color: var(--color-holiday); }
 
 .day.has-status {
@@ -333,6 +356,7 @@ select:disabled {
 .day[data-status="learning"] { border-color: var(--color-learning); background: #fff6d9; }
 .day[data-status="office"] { border-color: var(--color-office); background: #e8f7ef; }
 .day[data-status="remote"] { border-color: var(--color-remote); background: #f1f3f4; }
+.day[data-status="paidleave"] { border-color: var(--color-paidleave); background: #f4edff; }
 .day[data-status="holiday"] { border-color: var(--color-holiday); background: #e9f2ff; }
 
 .day-status-label {
@@ -349,6 +373,7 @@ select:disabled {
 .day[data-status="learning"] .day-status-label { background: var(--color-learning); }
 .day[data-status="office"] .day-status-label { background: var(--color-office); }
 .day[data-status="remote"] .day-status-label { background: var(--color-remote); }
+.day[data-status="paidleave"] .day-status-label { background: var(--color-paidleave); }
 .day[data-status="holiday"] .day-status-label { background: var(--color-holiday); }
 
 /* Right Panel: List */
@@ -561,12 +586,52 @@ select:disabled {
     display: flex;
     align-items: center;
 }
-.link-item a::before {
-    content: '迫'; /* Link icon */
-    margin-right: 12px;
-    font-size: 1.1rem;
+
+.memo-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
+.memo-input-row #memo-input {
+    flex: 1;
+}
+
+.memo-input-row #add-memo-btn {
+    min-width: 86px;
+    padding: 10px 14px;
+}
+
+.memo-error {
+    min-height: 1.2em;
+    font-size: 0.82rem;
+    color: var(--color-holiday);
+}
+
+.memo-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.memo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: #F9FCFF;
+    border: 2px solid var(--panel-border);
+    border-radius: 14px;
+    gap: 12px;
+}
+
+.memo-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-main);
+    word-break: break-word;
+}
 /* Modals */
 .modal {
     display: none;

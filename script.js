@@ -3,8 +3,33 @@ let state = {
     workStyle: 'office',
     calendarStatus: {}, // { "2024-04-15": "remote" }
     tasks: [], // { id, title, date, checked: false }
-    links: [] // { id, title, url }
+    links: [], // { id, title, url }
+    memos: [], // { id, text }
+    defaultLinksInitialized: false
 };
+
+const DEFAULT_LINKS = [
+    {
+        id: 'default-wowtalk',
+        title: 'WowTalk',
+        url: 'https://biz.wowtalk.org/webtalk/login?language=japanese'
+    },
+    {
+        id: 'default-q-navi',
+        title: 'Q-navi',
+        url: 'https://www.enavi-ts.net/ts-h-staff/Staff/login.aspx?ID=Ve4ctWhUz'
+    },
+    {
+        id: 'default-hataraku-db',
+        title: '働くDB',
+        url: 'https://hnfencer.rakurakuhanbai.jp/ggutk9a'
+    },
+    {
+        id: 'default-attendance-app',
+        title: '出社時打刻アプリ',
+        url: 'https://attend.rplearn.net/'
+    }
+];
 
 let currentDate = new Date();
 let selectedTaskDate = null;
@@ -13,6 +38,7 @@ const WORK_STYLE_LABELS = {
     learning: 'LC',
     office: '本',
     remote: '在',
+    paidleave: '有',
     holiday: '休'
 };
 
@@ -28,9 +54,14 @@ const elSelectedTaskGroup = document.getElementById('selected-task-group');
 const elSelectedTaskTitle = document.getElementById('selected-task-title');
 const elSelectedTaskList = document.getElementById('selected-task-list');
 const elLinkList = document.getElementById('link-list');
+const elMemoList = document.getElementById('memo-list');
+const elMemoInput = document.getElementById('memo-input');
+const elAddMemoBtn = document.getElementById('add-memo-btn');
+const elMemoError = document.getElementById('memo-error');
 
 const elImportStatus = document.getElementById('import-status');
 const elPasteImportBtn = document.getElementById('paste-import-btn');
+const elOpenWorkStyleEditBtn = document.getElementById('open-workstyle-edit-btn');
 
 // Initialize
 function init() {
@@ -53,10 +84,13 @@ function init() {
     setupModals();
     setupTabs();
     setupPasteImport();
+    setupWorkStyleEdit();
+    setupMemoInput();
 
     renderCalendar();
     renderTasks();
     renderLinks();
+    renderMemos();
 }
 
 function loadState() {
@@ -65,8 +99,24 @@ function loadState() {
         state = JSON.parse(saved);
         state.tasks = state.tasks || [];
         state.links = state.links || [];
+        state.memos = state.memos || [];
         state.calendarStatus = state.calendarStatus || {};
+        state.defaultLinksInitialized = state.defaultLinksInitialized || false;
     }
+
+    initializeDefaultLinks();
+}
+
+function initializeDefaultLinks() {
+    if (state.defaultLinksInitialized) {
+        return;
+    }
+
+    const existingIds = new Set(state.links.map((link) => link.id));
+    const linksToAdd = DEFAULT_LINKS.filter((link) => !existingIds.has(link.id));
+    state.links = [...linksToAdd, ...state.links];
+    state.defaultLinksInitialized = true;
+    saveState();
 }
 
 function saveState() {
@@ -113,6 +163,9 @@ function detectWorkStyleFromText(text) {
     }
     if (normalized.includes('在宅')) {
         return 'remote';
+    }
+    if (normalized.includes('有給')) {
+        return 'paidleave';
     }
 
     return null;
@@ -396,6 +449,64 @@ function setupPasteImport() {
     });
 }
 
+function setupWorkStyleEdit() {
+    const modal = document.getElementById('workstyle-edit-modal');
+    const dateInput = document.getElementById('workstyle-edit-date');
+    const statusSelect = document.getElementById('workstyle-edit-select');
+    const cancelBtn = document.getElementById('cancel-workstyle-edit');
+    const saveBtn = document.getElementById('save-workstyle-edit');
+
+    if (!elOpenWorkStyleEditBtn || !modal || !dateInput || !statusSelect || !cancelBtn || !saveBtn) {
+        return;
+    }
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+    };
+
+    const setFormFromDate = (dateStr) => {
+        dateInput.value = dateStr;
+        statusSelect.value = state.calendarStatus[dateStr] || 'holiday';
+    };
+
+    elOpenWorkStyleEditBtn.addEventListener('click', () => {
+        const targetDate = selectedTaskDate || getLocalIsoDate(new Date());
+        setFormFromDate(targetDate);
+        modal.classList.add('active');
+    });
+
+    dateInput.addEventListener('change', () => {
+        if (!dateInput.value) {
+            return;
+        }
+        statusSelect.value = state.calendarStatus[dateInput.value] || 'holiday';
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    saveBtn.addEventListener('click', () => {
+        const dateStr = dateInput.value;
+        const status = statusSelect.value;
+        if (!dateStr) {
+            return;
+        }
+
+        state.calendarStatus[dateStr] = status;
+        selectedTaskDate = dateStr;
+        syncWorkStyleDisplay();
+        saveState();
+        renderCalendar();
+        renderTasks();
+        closeModal();
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
+
 // Calendar Logic
 function renderCalendar() {
     const year = currentDate.getFullYear();
@@ -580,6 +691,71 @@ function renderLinks() {
         li.appendChild(delBtn);
         elLinkList.appendChild(li);
     });
+}
+
+function renderMemos() {
+    if (!elMemoList) {
+        return;
+    }
+    elMemoList.innerHTML = '';
+
+    state.memos.forEach((memo) => {
+        const li = document.createElement('li');
+        li.className = 'memo-item';
+
+        const text = document.createElement('span');
+        text.className = 'memo-text';
+        text.textContent = memo.text;
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'task-delete';
+        delBtn.innerHTML = '&times;';
+        delBtn.onclick = () => {
+            state.memos = state.memos.filter((m) => m.id !== memo.id);
+            saveState();
+            renderMemos();
+        };
+
+        li.appendChild(text);
+        li.appendChild(delBtn);
+        elMemoList.appendChild(li);
+    });
+}
+
+function setupMemoInput() {
+    if (!elMemoInput || !elAddMemoBtn || !elMemoError) {
+        return;
+    }
+
+    const clearError = () => {
+        elMemoError.textContent = '';
+    };
+
+    const submitMemo = () => {
+        const text = elMemoInput.value.trim();
+        if (text.length < 1 || text.length > 50) {
+            elMemoError.textContent = 'メモは1〜50文字で入力してください。';
+            return;
+        }
+
+        state.memos.push({
+            id: Date.now().toString(),
+            text
+        });
+        saveState();
+        renderMemos();
+        elMemoInput.value = '';
+        clearError();
+    };
+
+    elAddMemoBtn.addEventListener('click', submitMemo);
+    elMemoInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitMemo();
+        }
+    });
+    elMemoInput.addEventListener('input', clearError);
 }
 
 function updateUrgentCount() {
