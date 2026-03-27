@@ -396,7 +396,7 @@ select:disabled {
     transform: scale(1.05) translateY(-2px);
 }
 
-.day.sunday { color: var(--color-holiday); }
+.day.sunday { color: var(--text-main); }
 
 .day[data-status="learning"] { background: var(--color-learning); }
 .day[data-status="office"] { background: var(--color-office); }
